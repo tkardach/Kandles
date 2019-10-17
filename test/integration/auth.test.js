@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { User } = require('../../models/user');
 const bcrypt = require('bcrypt');
-
+const mongoose = require('mongoose');
 let server;
 let user;
 let token;
@@ -23,6 +23,7 @@ describe('auth middleware integration', () => {
 
     token = user.generateAuthToken();
   });
+
   afterEach(async () => {
     await User.deleteMany({});
     await server.close();

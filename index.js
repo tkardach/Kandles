@@ -10,6 +10,8 @@ require('./startup/db')();
 
 const port = process.env.PORT || config.get("port");
 
-const server = app.listen(port, () => console.log(`App listening on port ${port}`));
+const server = app.listen(port, () => {
+  console.log(`App listening on port ${port}`);
+});
 
 module.exports = server;

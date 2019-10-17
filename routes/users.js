@@ -18,13 +18,13 @@ const complexityOptions = {
 }
 
 router.get('/', async (req, res) => {
-  const users = User.find().select({ name: 1 });
-  res.send(users);
+  const users = await User.find().select('name');
+  res.status(200).send(users);
 });
 
 router.get('/me', auth, async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
-  res.send(user);
+  res.status(200).send(user);
 });
 
 router.post('/', async (req, res) => {
@@ -43,7 +43,9 @@ router.post('/', async (req, res) => {
   await user.save();
 
   const token = user.generateAuthToken();
-  res.header('x-auth-token', token).send(_.pick(user, ['name', 'email']));
+  res.status(200)
+    .header('x-auth-token', token)
+    .send(_.pick(user, ['name', 'email']));
 });
 
 module.exports = router;
