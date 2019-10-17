@@ -1,4 +1,5 @@
 {
   "port": "8080",
+  "jwtPrivateKey": "1234",
   "db": "mongodb://localhost/kandles_test"
 }

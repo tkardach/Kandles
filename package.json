@@ -3,19 +3,25 @@
   "version": "1.0.0",
   "description": "Website for my wife and I to sell candles and soaps",
   "main": "index.js",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "bcrypt": "^3.0.6",
     "config": "^3.2.3",
     "express": "^4.17.1",
     "joi": "^14.3.1",
+    "joi-password-complexity": "^3.1.0",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "mongoose": "^5.7.5"
   },
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --verbose"
   },
   "repository": {
     "type": "git",
