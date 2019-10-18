@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 255
   },
-  isAdmin: Boolean
+  isAdmin: {
+    type: Boolean,
+    default: false
+  }
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -42,6 +45,7 @@ userSchema.methods.generateAuthToken = function () {
 const User = mongoose.model("User", userSchema);
 
 function validateUser(user) {
+  // Exclude isAdmin from schema, so users cannot set themselves to admins
   const schema = {
     name: Joi.string()
       .min(2)

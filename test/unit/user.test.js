@@ -7,14 +7,14 @@ const request = require('supertest');
 // Test generating user token
 describe('user.generateAuthToken', () => {
   it('should return a vlid JWT', () => {
-    const paylod = {
+    const payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
       isAdmin: true
     };
-    const user = new User(paylod);
+    const user = new User(payload);
     const token = user.generateAuthToken();
     const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
-    expect(decoded).toMatchObject(paylod)
+    expect(decoded).toMatchObject(payload)
   });
 });
 
@@ -22,8 +22,6 @@ let server;
 
 // test user api
 describe('/api/users', () => {
-  let token;
-
   beforeEach(() => {
     server = require('../../index');
   });
@@ -36,9 +34,41 @@ describe('/api/users', () => {
   // should not return anything if there are no users
   // 
   describe('GET /', () => {
+    let adminToken;
+
+    beforeEach(async () => {
+      // Insert a user into the database
+      const user = new User({
+        name: 'testAdmin',
+        email: 'test@admin.com',
+        password: 'P@ssword2!',
+        isAdmin: true
+      });
+
+      adminToken = user.generateAuthToken();
+      await user.save();
+    });
+
     const exec = () => {
-      return request(server).get('/api/users');
+      return request(server)
+        .get('/api/users')
+        .set('x-auth-token', adminToken);
     }
+
+    // If the user is not an admin, it should return 403 error
+    it('should return 403 if user is not an admin', async () => {
+      adminToken = new User().generateAuthToken();
+      const res = await exec();
+      expect(res.status).toBe(403);
+    });
+
+    // If the database does not have users, it should not crash
+    it('should return no users if database empty', async () => {
+      await User.deleteMany({});
+      const res = await exec();
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(0);
+    });
 
     // GET should succesfully return users in the database
     it('should return all users', async () => {
@@ -53,15 +83,9 @@ describe('/api/users', () => {
       // Await the result, we expect the user to be returned
       const res = await exec();
       expect(res.status).toBe(200);
-      expect(res.body.length).toBe(1);
+      expect(res.body.length).toBe(2);
       expect(res.body.some(u => u.name === 'test2')).toBeTruthy();
-    });
-
-    // If the database does not have users, it should not crash
-    it('should return no users if database empty', async () => {
-      const res = await exec();
-      expect(res.status).toBe(200);
-      expect(res.body.length).toBe(0);
+      expect(res.body.some(u => u.name === 'testAdmin')).toBeTruthy();
     });
   });
 

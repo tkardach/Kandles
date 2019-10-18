@@ -6,6 +6,7 @@ const _ = require('lodash');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 const complexityOptions = {
   min: 8,
@@ -18,7 +19,7 @@ const complexityOptions = {
 }
 
 // GET all users in database
-router.get('/', async (req, res) => {
+router.get('/', [auth, admin], async (req, res) => {
   const users = await User.find().select('name');
   res.status(200).send(users);
 });
