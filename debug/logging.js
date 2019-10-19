@@ -1,5 +1,6 @@
 const winston = require('winston');
 
+// General logger
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
@@ -13,20 +14,32 @@ const logger = winston.createLogger({
   ]
 });
 
+// Security logger monitors all suspicious activity that could be a security threat
 const securityLogger = winston.createLogger({
   transports: [
     new winston.transports.File({ filename: 'logs_security.log' })
   ]
 });
 
+// Uncaught exceptions loggers logs all uncaught exceptions
 const uncaughtExceptions = winston.createLogger({
   transports: [
     new winston.transports.File({ filename: 'logs_uncaughtEx.log', level: 'error' })
   ]
 });
 
+// If we are in test mode, remove all transports and use only the test logging files
+if (process.env.NODE_ENV === 'test') {
+  securityLogger.clear();
+  logger.clear();
+  uncaughtExceptions.clear();
+
+  securityLogger.add(new winston.transports.File({ filename: 'tests_security.log' }));
+  logger.add(new winston.transports.File({ filename: 'tests_general.log' }));
+  uncaughtExceptions.add(new winston.transports.File({ filename: 'tests_uncaughtEx.log', level: 'error' }));
+
 // If we are not in production mode, add console logging
-if (process.env.NODE_ENV !== 'production') {
+} else if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({
     format: winston.format.simple()
   }));

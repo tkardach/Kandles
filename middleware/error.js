@@ -1,4 +1,4 @@
-const {uncaughtExceptions} = require('../logging');
+const {uncaughtExceptions} = require('../debug/logging');
 
 module.exports = function (err, req, res, next) {
   uncaughtExceptions.log({

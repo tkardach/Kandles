@@ -1,5 +1,5 @@
 const config = require('config')
-const {logger} = require('./logging');
+const {logger} = require('./debug/logging');
 const express = require('express');
 const app = express();
 

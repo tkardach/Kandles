@@ -1,4 +1,4 @@
-const {securityLogger} = require('../logging');
+const {securityLogger} = require('../debug/logging');
 
 module.exports = function (req, res, next) {
     if (!req.user.isAdmin) {
