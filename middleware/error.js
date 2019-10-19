@@ -1,4 +1,10 @@
+const {uncaughtExceptions} = require('../logging');
+
 module.exports = function (err, req, res, next) {
-  console.log('Internal Server Error.')
+  uncaughtExceptions.log({
+    level: 'error',
+    message: err.message
+  });
+
   res.status(500).send('Internal server error.');
 }

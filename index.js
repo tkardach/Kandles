@@ -1,4 +1,5 @@
 const config = require('config')
+const {logger} = require('./logging');
 const express = require('express');
 const app = express();
 
@@ -11,7 +12,10 @@ require('./startup/db')();
 const port = process.env.PORT || config.get("port");
 
 const server = app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+  logger.log({
+    level: 'info',
+    message: `App listening on port ${port}`
+  });
 });
 
 module.exports = server;

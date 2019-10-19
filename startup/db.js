@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const config = require('config');
+const {logger} = require('../logging');
 
 module.exports = async function () {
   const db = config.get('db');
@@ -9,6 +10,9 @@ module.exports = async function () {
     useCreateIndex: true
   })
     .then(() => {
-      return console.log('Connected to database');
+      logger.log({
+        level: 'info',
+        message: 'Connected to MongoDB database.'
+      });
     });
 }
