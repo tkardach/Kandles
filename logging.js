@@ -13,6 +13,12 @@ const logger = winston.createLogger({
   ]
 });
 
+const securityLogger = winston.createLogger({
+  transports: [
+    new winston.transports.File({ filename: 'logs_security.log' })
+  ]
+});
+
 const uncaughtExceptions = winston.createLogger({
   transports: [
     new winston.transports.File({ filename: 'logs_uncaughtEx.log', level: 'error' })
@@ -31,3 +37,4 @@ if (process.env.NODE_ENV !== 'production') {
 
 module.exports.logger = logger;
 module.exports.uncaughtExceptions = uncaughtExceptions;
+module.exports.securityLogger = securityLogger;
