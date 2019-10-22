@@ -40,22 +40,24 @@ function validatePostScent(scent) {
     ecoFriendly: Joi.boolean()
       .required()
   };
-  
-  function validatePutScent(scent) {
-    const schema = {
-      name: Joi.string()
-        .min(2)
-        .max(50)
-        .required(),
-      soapSafe: Joi.boolean(),
-      candleSafe: Joi.boolean(),
-      lotionSafe: Joi.boolean(),
-      phtalateFree: Joi.boolean(),
-      prop65: Joi.boolean(),
-      vegan: Joi.boolean(),
-      ecoFriendly: Joi.boolean()
-    };
-  }
+
+  return Joi.validate(scent, schema);
+}
+
+function validatePutScent(scent) {
+  const schema = {
+    name: Joi.string()
+      .min(2)
+      .max(50)
+      .required(),
+    soapSafe: Joi.boolean(),
+    candleSafe: Joi.boolean(),
+    lotionSafe: Joi.boolean(),
+    phtalateFree: Joi.boolean(),
+    prop65: Joi.boolean(),
+    vegan: Joi.boolean(),
+    ecoFriendly: Joi.boolean()
+  };
 
   return Joi.validate(scent, schema);
 }
