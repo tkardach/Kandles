@@ -31,7 +31,7 @@ function validatePostScent(scent) {
       .required(),
     lotionSafe: Joi.boolean()
       .required(),
-    phtalateFree: Joi.boolean()
+    phthalateFree: Joi.boolean()
       .required(),
     prop65: Joi.boolean()
       .required(),
