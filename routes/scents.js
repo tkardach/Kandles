@@ -47,6 +47,19 @@ router.post('/', [auth, admin], async (req, res) => {
       'vegan',
       'ecoFriendly']));
 
+  const dbScent = await Scent.find({
+    name: req.body.name,
+    soapSafe: req.body.soapSafe,
+    candleSafe: req.body.candleSafe,
+    lotionSafe: req.body.lotionSafe,
+    phthalateFree: req.body.phthalateFree,
+    prop65: req.body.prop65,
+    vegan: req.body.vegan,
+    ecoFriendly: req.body.ecoFriendly
+  });
+
+  if (dbScent.length > 0) return res.status(400).send('Scent already exists.');
+
   await scent.save();
 
   // return created scent

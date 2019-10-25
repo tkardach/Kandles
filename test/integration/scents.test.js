@@ -330,6 +330,15 @@ describe('/api/scents', () => {
       expect(res.status).toBe(400);
     });
 
+    it('should return 400 if an identical scent exists', async () => {
+      const scent = new Scent(scentPayload);
+      await scent.save();
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
     it('should return 200 if request is successful', async () => {
       const res = await exec();
 
