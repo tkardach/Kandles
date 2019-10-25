@@ -324,14 +324,7 @@ describe('/api/scents', () => {
       await admin.save();
 
       scentPayload = {
-        name: 'testScent',
-        soapSafe: true,
-        candleSafe: true,
-        lotionSafe: true,
-        phthalateFree: true,
-        prop65: true,
-        vegan: true,
-        ecoFriendly: true
+        name: 'testScent'
       };
 
       scent = new Scent(scentPayload);
@@ -396,7 +389,10 @@ describe('/api/scents', () => {
     });
 
     it('should return 400 if property is invalid', async () => {
-      scentPayload.prop65 = 't';
+      scentPayload = {
+        name: scentPayload.name,
+        prop65: 't'
+      };
 
       const res = await exec();
 
@@ -407,6 +403,17 @@ describe('/api/scents', () => {
       const res = await exec();
 
       expect(res.status).toBe(200);
+    });
+
+    it('should allow updating parameters other than name', async () => {
+      scentPayload = {
+        name: scentPayload.name,
+        prop65: true
+      };
+
+      const res = await exec();
+
+      expect(res.body).toHaveProperty('prop65', true);
     });
 
     it('should return updated scent on success', async () => {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { logger } = require('../debug/logging');
-const { Scent, validatePostScent } = require('../models/scent');
+const { Scent, validatePostScent, validatePutScent } = require('../models/scent');
 const validateObjectId = require('../middleware/validateObjectId');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
@@ -58,7 +58,7 @@ router.post('/', [auth, admin], async (req, res) => {
 // altering existing scents
 router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
   // validate the scent attributes
-  const { error } = validatePostScent(req.body);
+  const { error } = validatePutScent(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   // find and update the scent by id
