@@ -267,6 +267,53 @@ describe('/api/scents', () => {
       expect(res.status).toBe(400);
     });
 
+    it('should return 400 if name is invalid', async () => {
+      scentPayload = {
+        name: 1234,
+        soapSafe: true,
+        candleSafe: true,
+        lotionSafe: true,
+        phthalateFree: true,
+        prop65: true,
+        vegan: true
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if name is missing', async () => {
+      scentPayload = {
+        soapSafe: true,
+        candleSafe: true,
+        lotionSafe: true,
+        phthalateFree: true,
+        prop65: true,
+        vegan: true
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if a boolean flag is invalid', async () => {
+      scentPayload = {
+        name: 'testScent',
+        soapSafe: 'true',
+        candleSafe: true,
+        lotionSafe: true,
+        phthalateFree: true,
+        prop65: true,
+        vegan: true
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
     it('should return 400 if a flag is missing', async () => {
       scentPayload = {
         name: 'testScent',
@@ -382,6 +429,38 @@ describe('/api/scents', () => {
 
     it('should return 400 if name is more than 50 characters', async () => {
       scentPayload.name = 't' * 51;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+
+    it('should return 400 if name is invalid', async () => {
+      scentPayload = {
+        name: 1234,
+        soapSafe: true,
+        candleSafe: true,
+        lotionSafe: true,
+        phthalateFree: true,
+        prop65: true,
+        vegan: true
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if name is missing', async () => {
+      scentPayload = {
+        soapSafe: true,
+        candleSafe: true,
+        lotionSafe: true,
+        phthalateFree: true,
+        prop65: true,
+        vegan: true
+      };
 
       const res = await exec();
 
