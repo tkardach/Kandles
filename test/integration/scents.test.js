@@ -17,6 +17,9 @@ describe('/api/scents', () => {
     await server.close();
   });
 
+  /**********************************************
+   *  GET all dyes from database
+   **********************************************/
   describe('GET /', () => {
     let admin;
     let token;
@@ -98,12 +101,9 @@ describe('/api/scents', () => {
     });
   });
 
-  // should return 401 with no token
-  // should return 403 if user is not admin
-  // should return 404 if the id is invalid
-  // should return 400 if scent id does not match
-  // should return 200 on success
-  // should return proper scent on success
+  /**********************************************
+   *  GET scent with given Id
+   **********************************************/
   describe('GET /:id', () => {
     let admin;
     let scent;
@@ -183,6 +183,9 @@ describe('/api/scents', () => {
   });
 
 
+  /**********************************************
+   *  POST scent to database
+   **********************************************/
   describe('POST /', () => {
     let admin;
     let adminToken;
@@ -361,6 +364,9 @@ describe('/api/scents', () => {
     });
   });
 
+  /**********************************************
+   *  PUT/update dye with id in the database
+   **********************************************/
   describe('PUT /:id', () => {
     let admin;
     let adminToken;
@@ -523,7 +529,9 @@ describe('/api/scents', () => {
     });
   });
 
-
+  /**********************************************
+   *  DELETE dye with id from database
+   **********************************************/
   describe('DELETE /:id', () => {
     let admin;
     let adminToken;
