@@ -509,4 +509,105 @@ describe('/api/dyes', () => {
       expect(dbDye[0].name).toBe(dyePayload.name);
     });
   });
+
+  /**********************************************
+   *  DELETE dye with given id
+   **********************************************/
+  describe('DELETE /:id', () => {
+    let admin;
+    let token;
+    let dyeId;
+    let dyeName;
+
+    beforeEach(async () => {
+      admin = new User({
+        name: 'testAdmin',
+        email: 'test@admin.com',
+        password: 'P@ssword2!',
+        isAdmin: true
+      });
+
+      token = admin.generateAuthToken();
+      await admin.save();
+
+      dyeName = 'testDye';
+
+      const dye = new Dye({
+        name: dyeName,
+        soapSafe: true,
+        candleSafe: true,
+        lotionSafe: true,
+        prop65: true
+      });
+      dyeId = dye._id;
+
+      await dye.save();
+    });
+
+    const exec = () => {
+      return request(server)
+        .delete('/api/dyes/' + dyeId)
+        .set('x-auth-token', token);
+    }
+
+    it('should return 401 if token is missing', async () => {
+      token = '';
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 400 if token is invalid', async () => {
+      token = '123';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 403 if user is not an admin', async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 400 if objectId is invalid', async () => {
+      dyeId = '123';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 404 if object with id is not found', async () => {
+      dyeId = new mongoose.Types.ObjectId().toHexString();
+
+      const res = await exec();
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 200 on success', async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it('should return removed dye on success', async () => {
+      const res = await exec();
+
+      expect(res.body).toHaveProperty('name', dyeName);
+    });
+    
+    it('should remove the dye from the database on success', async () => {
+      const res = await exec();
+
+      const dbDye = await Dye.findById(dyeId);
+
+      expect(dbDye).toBe(null);
+    });
+  });
 });

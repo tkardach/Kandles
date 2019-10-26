@@ -15,7 +15,7 @@ router.get('/', [auth, admin], async (req, res) => {
 });
 
 router.get('/:id', [auth, admin, validateObjectId], async (req, res) => {
-  const dye = await Dye.find(req.params.id);
+  const dye = await Dye.findById(req.params.id);
 
   if (!dye) return res.status(404).send('Dye with that id not found.');
 
@@ -68,6 +68,14 @@ router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
     level: 'info',
     message: `Dye Updated: ${dye}`
   });
+
+  res.status(200).send(dye);
+});
+
+router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
+  const dye = await Dye.findByIdAndDelete(req.params.id);
+
+  if (!dye) return res.status(404).send('Dye with that Id not found.');
 
   res.status(200).send(dye);
 });
