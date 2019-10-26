@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const { logger } = require('../debug/logging');
 const { Dye, validatePostDye, validatePutDye } = require('../models/dye');
 const validateObjectId = require('../middleware/validateObjectId');
@@ -8,12 +7,16 @@ const _ = require('lodash');
 const express = require('express');
 const router = express.Router();
 
+// GET all dyes from the database
+//  don't allow non-admins to see dyes
 router.get('/', [auth, admin], async (req, res) => {
   const dyes = await Dye.find();
 
   res.status(200).send(dyes);
 });
 
+// GET the dye with the specified Id
+//  don't allow non-admins to see dyes
 router.get('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const dye = await Dye.findById(req.params.id);
 
@@ -22,6 +25,8 @@ router.get('/:id', [auth, admin, validateObjectId], async (req, res) => {
   res.status(200).send(dye);
 });
 
+// POST/Create a new dye in the database
+//  don't allow non-admins to create dyes
 router.post('/', [auth, admin], async (req, res) => {
   const { error } = validatePostDye(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -48,7 +53,8 @@ router.post('/', [auth, admin], async (req, res) => {
   res.status(200).send(dye);
 });
 
-
+// PUT/Update the dye with specified id
+//  don't allow non-admins to alter dyes
 router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const {error} = validatePutDye(req.body);
   if (error) return res.status(400).send(error.details[0].message)
@@ -72,6 +78,8 @@ router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
   res.status(200).send(dye);
 });
 
+// DELETE the dye with specified id
+//  don't allow non-admins to delete dyes
 router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const dye = await Dye.findByIdAndDelete(req.params.id);
 

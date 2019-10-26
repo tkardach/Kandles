@@ -51,8 +51,7 @@ function validatePutDye(dye) {
   const schema = {
     name: Joi.string()
       .min(2)
-      .max(50)
-      .required(),
+      .max(50),
     soapSafe: Joi.boolean(),
     candleSafe: Joi.boolean(),
     lotionSafe: Joi.boolean(),
