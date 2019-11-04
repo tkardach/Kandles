@@ -36,4 +36,25 @@ router.post('/', [auth, admin], async (req, res) => {
   res.status(200).send(wax);
 });
 
+// PUT wax to database
+//  don't allow non-admins to put wax
+router.put('/:id', [auth, admin], async (req, res) => {
+  const { error } = validatePutWax(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const wax = await Wax.findByIdAndUpdate(req.params.id,
+    {
+      $set: _.pick(req.body,
+        ['name',
+          'prop65',
+          'ecoFriendly',
+          'applications',
+          'waxType'])
+    }, { new: true });
+
+  if (!wax) return res.status(404).send('Could not find wax with matching Id.');
+
+  res.status(200).send(wax);
+});
+
 module.exports = router;

@@ -4,7 +4,7 @@ const request = require('supertest');
 
 let server;
 
-// test waxes api
+// test /api/waxes
 describe('/api/waxes', () => {
   beforeEach(() => {
     server = require('../../index');
@@ -17,7 +17,7 @@ describe('/api/waxes', () => {
   });
 
   /**********************************************
-   *  GET waxes
+   *  GET /api/waxes
    **********************************************/
   describe('GET /', () => {
     let adminToken;
@@ -96,7 +96,7 @@ describe('/api/waxes', () => {
   });
 
   /**********************************************
-   *  POST wax
+   *  POST /api/waxes
    **********************************************/
   describe('POST /', () => {
     let token;
@@ -318,6 +318,188 @@ describe('/api/waxes', () => {
       expect(res.body).toHaveProperty('prop65', payload.prop65);
       expect(res.body).toHaveProperty('ecoFriendly', payload.ecoFriendly);
       expect(res.body).toHaveProperty('waxType', payload.waxType);
+    });
+  });
+
+  /**********************************************
+   *  PUT /api/waxes/:id
+   **********************************************/
+  describe('PUT /:id', () => {
+    let token;
+    let payload;
+    let waxId;
+
+    beforeEach(async () => {
+      admin = new User({
+        name: 'testAdmin',
+        email: 'test@admin.com',
+        password: 'P@ssword2!',
+        isAdmin: true
+      });
+
+      token = admin.generateAuthToken();
+      await admin.save();
+
+      payload = {
+        name: '464',
+        prop65: true,
+        ecoFriendly: true,
+        applications: ['container', 'tealight'],
+        waxType: 'soy'
+      };
+
+      const wax = new Wax(payload);
+
+      waxId = wax._id;
+
+      await wax.save();
+
+      payload.applications = ['pillar'];
+    });
+
+    const exec = () => {
+      return request(server)
+        .put('/api/waxes/' + waxId)
+        .set('x-auth-token', token)
+        .send(payload);
+    }
+
+    it('should return 400 if token is invalid', async () => {
+      token = '123';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 401 if no token is provided', async () => {
+      token = '';
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 403 if user is not an admin', async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(403);
+    });
+
+    it('return 404 if wax could not be found', async () => {
+      await Wax.deleteMany({});
+
+      const res = await exec();
+
+      expect(res.status).toBe(404);
+    });
+
+    it('return 400 if applications is empty', async () => {
+      payload = {
+        name: '464',
+        ecoFriendly: true,
+        applications: [],
+        waxType: 'soy'
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if application value is invalid', async () => {
+      payload.applications = [1234];
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if application string value is invalid', async () => {
+      payload.applications = ['test', 'pillar'];
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if waxType value is invalid', async () => {
+      payload.waxType = 1234;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if waxType string value is invalid', async () => {
+      payload.waxType = 'test';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if bool value is invalid', async () => {
+      payload.prop65 = 1234;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if name is invalid', async () => {
+      payload.name = 1234;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if name is less than 2 characters', async () => {
+      payload.name = 'a';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if name is more than 50 characters', async () => {
+      payload.name = 'a' * 50;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 200 on success', async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it('should return 200 with payload updating only 1 value', async () => {
+      payload = { applications: ['pillar'] };
+
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it('should update wax in database on success', async () => {
+      await exec();
+
+      const dbWax = await Wax.findById(waxId);
+
+      expect(dbWax['applications']).toContain('pillar');
+    });
+
+    it('should return updated wax on success', async () => {
+      const res = await exec();
+
+      expect(res.body).toHaveProperty('name', payload.name);
+      expect(res.body.applications).toContain('pillar');
     });
   });
 });
