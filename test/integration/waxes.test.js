@@ -16,8 +16,9 @@ describe('/api/waxes', () => {
     await server.close();
   });
 
-  // should not return anything if there are no users
-  // 
+  /**********************************************
+   *  GET waxes
+   **********************************************/
   describe('GET /', () => {
     let adminToken;
 
@@ -94,16 +95,11 @@ describe('/api/waxes', () => {
     });
   });
 
-  // return 400 if wax with identical name exists
-  // return 400 if duplicate applications
-  // return 400 if invalid applications
-  // return 400 if invalid waxType
-  // return 400 if missing properties
-  // return 400 if name is < 2 characters
-  // return 400 if name is > 50 characters
-  // 
+  /**********************************************
+   *  POST wax
+   **********************************************/
   describe('POST /', () => {
-    let adminToken;
+    let token;
     let payload;
 
     beforeEach(async () => {
@@ -121,7 +117,7 @@ describe('/api/waxes', () => {
         name: '464',
         prop65: true,
         ecoFriendly: true,
-        applications: ['container', 'pillar', 'tealight'],
+        applications: ['container', 'tealight'],
         waxType: 'soy'
       };
     });
@@ -155,6 +151,173 @@ describe('/api/waxes', () => {
       const res = await exec();
 
       expect(res.status).toBe(403);
+    });
+
+    it('return 400 if wax with identical name exists', async () => {
+      const wax = new Wax(payload);
+      await wax.save();
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if applications has duplicate value', async () => {
+      payload.applications = ['container', 'container', 'pillar', 'tealight'];
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if applications string is invalid', async () => {
+      payload.applications = ['testType', 'pillar', 'tealight'];
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if applications types are invalid', async () => {
+      payload.applications = [1234, 'pillar', 'tealight'];
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if applications is missing', async () => {
+      payload = {
+        name: '464',
+        prop65: true,
+        ecoFriendly: true,
+        waxType: 'soy'
+      };
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if applications is empty', async () => {
+      payload.applications = [];
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if waxType string is invalid', async () => {
+      payload.waxType = 'test';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if waxType value is invalid', async () => {
+      payload.waxType = 1234;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if waxType is missing', async () => {
+      payload = {
+        name: '464',
+        prop65: true,
+        ecoFriendly: true,
+        applications: ['container', 'pillar', 'tealight']
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if name is missing', async () => {
+      payload = {
+        prop65: true,
+        ecoFriendly: true,
+        applications: ['container', 'pillar', 'tealight'],
+        waxType: 'soy'
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if name is invalid', async () => {
+      payload.name = 1234;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if name is less than 2 characters', async () => {
+      payload.name = 'a';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if name is greater than 50 characters', async () => {
+      payload.name = 'a' * 50;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if invalid bool property', async () => {
+      payload.prop65 = 'test';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 400 if missing a bool property', async () => {
+      payload = {
+        name: '464',
+        ecoFriendly: true,
+        applications: ['container', 'pillar', 'tealight'],
+        waxType: 'soy'
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('return 200 on success', async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it('post wax to database on success', async () => {
+      const res = await exec();
+
+      const dbWax = await Wax.find({ name: payload.name });
+
+      expect(dbWax.length).toBe(1);
+      expect(dbWax[0]).toHaveProperty('name', payload.name);
+      expect(dbWax[0]).toHaveProperty('prop65', payload.prop65);
+      expect(dbWax[0]).toHaveProperty('ecoFriendly', payload.ecoFriendly);
+      expect(dbWax[0]).toHaveProperty('waxType', payload.waxType);
+    });
+
+    it('return wax on success', async () => {
+      const res = await exec();
+
+      expect(res.body).toHaveProperty('name', payload.name);
+      expect(res.body).toHaveProperty('prop65', payload.prop65);
+      expect(res.body).toHaveProperty('ecoFriendly', payload.ecoFriendly);
+      expect(res.body).toHaveProperty('waxType', payload.waxType);
     });
   });
 });

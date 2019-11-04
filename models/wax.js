@@ -44,9 +44,6 @@ var validator = function (value) {
 waxSchema.path('applications').validate(validator,
   'Application `{VALUE}` is not valid.', 'Duplicate Applications');
 
-waxSchema.path('waxType').validate(validator,
-  ' Wax Type `{VALUE}` is not valid.', 'Duplicate Wax Types');
-
 const Wax = mongoose.model("Wax", waxSchema);
 
 function validatePostWax(wax) {
@@ -57,8 +54,14 @@ function validatePostWax(wax) {
       .required(),
     prop65: Joi.boolean().required(),
     ecoFriendly: Joi.boolean().required(),
-    applications: Joi.array().items(applicationsEnum).unique().required(),
-    waxType: Joi.array().allow(waxTypeEnum).required()
+    applications: Joi.array()
+      .min(1)
+      .items(applicationsEnum)
+      .unique()
+      .required(),
+    waxType: Joi.string()
+      .valid(...waxTypeEnum)
+      .required()
   };
 
   return Joi.validate(wax, schema);
@@ -71,8 +74,12 @@ function validatePutWax(wax) {
       .max(50),
     prop65: Joi.boolean(),
     ecoFriendly: Joi.boolean(),
-    applications: Joi.array().items(applicationsEnum).unique(),
-    waxType: Joi.string().allow(waxTypeEnum)
+    applications: Joi.array()
+      .min(1)
+      .items(applicationsEnum)
+      .unique(),
+    waxType: Joi.string()
+      .valid(...waxTypeEnum)
   };
 
   return Joi.validate(wax, schema);
