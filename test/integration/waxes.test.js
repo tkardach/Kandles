@@ -96,6 +96,100 @@ describe('/api/waxes', () => {
   });
 
   /**********************************************
+   *  GET /api/waxes/:id
+   **********************************************/
+  describe('GET /:id', () => {
+    let token;
+    let waxId;
+
+    beforeEach(async () => {
+      admin = new User({
+        name: 'testAdmin',
+        email: 'test@admin.com',
+        password: 'P@ssword2!',
+        isAdmin: true
+      });
+
+      token = admin.generateAuthToken();
+      await admin.save();
+
+      const wax = new Wax({
+        name: '464',
+        prop65: true,
+        ecoFriendly: true,
+        applications: ['container', 'tealight'],
+        waxType: 'soy'
+      });
+
+      waxId = wax._id;
+
+      await wax.save();
+    });
+
+    const exec = () => {
+      return request(server)
+        .get('/api/waxes/' + waxId)
+        .set('x-auth-token', token);
+    }
+
+    it('should return 400 if token is invalid', async () => {
+      token = '123';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 401 if no token is provided', async () => {
+      token = '';
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 403 if user is not an admin', async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 400 if the object id is not valid', async () => {
+      waxId = 123;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 404 if wax with matching id cannot be found', async () => {
+      await Wax.deleteMany({});
+
+      const res = await exec();
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 200 on success', async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it('should return wax on success', async () => {
+      const res = await exec();
+
+      expect(res.body).toHaveProperty('name');
+      expect(res.body).toHaveProperty('prop65');
+      expect(res.body).toHaveProperty('ecoFriendly');
+      expect(res.body).toHaveProperty('applications');
+      expect(res.body).toHaveProperty('waxType');
+    });
+  });
+
+  /**********************************************
    *  POST /api/waxes
    **********************************************/
   describe('POST /', () => {
@@ -307,6 +401,7 @@ describe('/api/waxes', () => {
       expect(dbWax.length).toBe(1);
       expect(dbWax[0]).toHaveProperty('name', payload.name);
       expect(dbWax[0]).toHaveProperty('prop65', payload.prop65);
+      expect(dbWax[0]).toHaveProperty('applications');
       expect(dbWax[0]).toHaveProperty('ecoFriendly', payload.ecoFriendly);
       expect(dbWax[0]).toHaveProperty('waxType', payload.waxType);
     });
@@ -316,6 +411,7 @@ describe('/api/waxes', () => {
 
       expect(res.body).toHaveProperty('name', payload.name);
       expect(res.body).toHaveProperty('prop65', payload.prop65);
+      expect(res.body).toHaveProperty('applications');
       expect(res.body).toHaveProperty('ecoFriendly', payload.ecoFriendly);
       expect(res.body).toHaveProperty('waxType', payload.waxType);
     });
@@ -386,6 +482,14 @@ describe('/api/waxes', () => {
       const res = await exec();
 
       expect(res.status).toBe(403);
+    });
+
+    it('should return 400 if the object id is not valid', async () => {
+      waxId = 123;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
     });
 
     it('return 404 if wax could not be found', async () => {
@@ -500,6 +604,104 @@ describe('/api/waxes', () => {
 
       expect(res.body).toHaveProperty('name', payload.name);
       expect(res.body.applications).toContain('pillar');
+      expect(res.body).toHaveProperty('prop65');
+      expect(res.body).toHaveProperty('ecoFriendly');
+      expect(res.body).toHaveProperty('applications');
+      expect(res.body).toHaveProperty('waxType');
+    });
+  });
+
+  /**********************************************
+   *  DELETE /api/waxes/:id
+   **********************************************/
+  describe('DELETE /:id', () => {
+    let token;
+    let waxId;
+
+    beforeEach(async () => {
+      admin = new User({
+        name: 'testAdmin',
+        email: 'test@admin.com',
+        password: 'P@ssword2!',
+        isAdmin: true
+      });
+
+      token = admin.generateAuthToken();
+      await admin.save();
+
+      const wax = new Wax({
+        name: '464',
+        prop65: true,
+        ecoFriendly: true,
+        applications: ['container', 'tealight'],
+        waxType: 'soy'
+      });
+
+      waxId = wax._id;
+
+      await wax.save();
+    });
+
+    const exec = () => {
+      return request(server)
+        .delete('/api/waxes/' + waxId)
+        .set('x-auth-token', token);
+    }
+
+    it('should return 400 if token is invalid', async () => {
+      token = '123';
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 401 if no token is provided', async () => {
+      token = '';
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 403 if user is not an admin', async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 400 if the object id is not valid', async () => {
+      waxId = 123;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 404 if wax with matching id cannot be found', async () => {
+      await Wax.deleteMany({});
+
+      const res = await exec();
+
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 200 on success', async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it('should return deleted wax on success', async () => {
+      const res = await exec();
+
+      expect(res.body).toHaveProperty('name');
+      expect(res.body).toHaveProperty('prop65');
+      expect(res.body).toHaveProperty('ecoFriendly');
+      expect(res.body).toHaveProperty('applications');
+      expect(res.body).toHaveProperty('waxType');
     });
   });
 });

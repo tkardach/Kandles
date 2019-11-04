@@ -15,6 +15,15 @@ router.get('/', [auth, admin], async (req, res) => {
   res.status(200).send(waxes);
 });
 
+// GET wax by id from database
+//  don't allow non-admins to see waxes
+router.get('/:id', [auth, admin, validateObjectId], async (req, res) => {
+  const wax = await Wax.findById(req.params.id);
+  if (!wax) return res.status(404).send('Cannot find wax with matching Id.');
+
+  res.status(200).send(wax);
+});
+
 // POST wax to database
 //  don't allow non-admins to post wax
 router.post('/', [auth, admin], async (req, res) => {
@@ -38,7 +47,7 @@ router.post('/', [auth, admin], async (req, res) => {
 
 // PUT wax to database
 //  don't allow non-admins to put wax
-router.put('/:id', [auth, admin], async (req, res) => {
+router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const { error } = validatePutWax(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -53,6 +62,15 @@ router.put('/:id', [auth, admin], async (req, res) => {
     }, { new: true });
 
   if (!wax) return res.status(404).send('Could not find wax with matching Id.');
+
+  res.status(200).send(wax);
+});
+
+// DELETE wax from database
+//  don't allow non-admins to delete wax
+router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
+  const wax = await Wax.findByIdAndDelete(req.params.id);
+  if (!wax) return res.status(404).send('Could not find wax with matching Id');
 
   res.status(200).send(wax);
 });
