@@ -3,6 +3,7 @@ const auth = require('../routes/auth');
 const users = require('../routes/users');
 const scents = require('../routes/scents');
 const dyes = require('../routes/dyes');
+const waxes = require('../routes/waxes');
 const home = require('../routes/home');
 const error = require('../middleware/error');
 
@@ -14,6 +15,7 @@ module.exports = function (app) {
   app.use('/api/users', users);
   app.use('/api/scents', scents);
   app.use('/api/dyes', dyes);
+  app.use('/api/waxes', waxes);
   app.use('/', home);
 
   // Error handling middleware
