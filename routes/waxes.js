@@ -63,6 +63,11 @@ router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
 
   if (!wax) return res.status(404).send('Could not find wax with matching Id.');
 
+  logger.log({
+    level: 'info',
+    message: `Wax Updated: ${wax}`
+  });
+
   res.status(200).send(wax);
 });
 
@@ -71,6 +76,11 @@ router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
 router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const wax = await Wax.findByIdAndDelete(req.params.id);
   if (!wax) return res.status(404).send('Could not find wax with matching Id');
+
+  logger.log({
+    level: 'info',
+    message: `Wax Deleted: ${wax}`
+  });
 
   res.status(200).send(wax);
 });

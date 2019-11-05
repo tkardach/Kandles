@@ -694,6 +694,13 @@ describe('/api/waxes', () => {
       expect(res.status).toBe(200);
     });
 
+    it('should delete wax from database', async () => {
+      await exec();
+
+      const dbWax = await Wax.findById(waxId);
+      expect(dbWax).toBe(null);
+    });
+
     it('should return deleted wax on success', async () => {
       const res = await exec();
 

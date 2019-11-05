@@ -106,6 +106,11 @@ router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const scent = await Scent.findByIdAndDelete(req.params.id);
   if (!scent) return res.status(404).send('Scent with that id not found');
 
+  logger.log({
+    level: 'info',
+    message: `Scent Deleted: ${scent}`
+  });
+
   // return deleted scent
   res.status(200).send(scent);
 });

@@ -56,7 +56,7 @@ router.post('/', [auth, admin], async (req, res) => {
 // PUT/Update the dye with specified id
 //  don't allow non-admins to alter dyes
 router.put('/:id', [auth, admin, validateObjectId], async (req, res) => {
-  const {error} = validatePutDye(req.body);
+  const { error } = validatePutDye(req.body);
   if (error) return res.status(400).send(error.details[0].message)
 
   const dye = await Dye.findByIdAndUpdate(req.params.id, {
@@ -84,6 +84,11 @@ router.delete('/:id', [auth, admin, validateObjectId], async (req, res) => {
   const dye = await Dye.findByIdAndDelete(req.params.id);
 
   if (!dye) return res.status(404).send('Dye with that Id not found.');
+
+  logger.log({
+    level: 'info',
+    message: `Dye Deleted: ${dye}`
+  });
 
   res.status(200).send(dye);
 });
