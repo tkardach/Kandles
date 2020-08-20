@@ -7,7 +7,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "config": "^3.2.3",
     "express": "^4.17.1",
     "joi": "^14.3.1",
